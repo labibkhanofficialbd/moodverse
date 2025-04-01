@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood-Based Quranic Verses</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            background-color: #1d3557;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        
+        .mood-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .mood-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .mood-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mood-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mood-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1d3557;
+        }
+        
+        .verse-container {
+            max-width: 800px;
+            width: 90%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            display: none;
+        }
+        
+        .verse-content {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        .verse-arabic {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            text-align: right;
+            direction: rtl;
+        }
+        
+        .verse-reference {
+            font-size: 1rem;
+            color: #555;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #1d3557;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .back-button {
+            background-color: #1d3557;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .back-button:hover {
+            background-color: #152538;
+        }
+        
+        footer {
+            margin-top: auto;
+            background-color: #1d3557;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mood-Based Quranic Verses</h1>
+        <p class="subtitle">Select a mood to receive a relevant verse from the Holy Quran</p>
+    </header>
+    
+    <div class="container">
+        <div class="mood-container">
+            <div class="mood-card" data-mood="happiness">
+                <div class="mood-icon">😊</div>
+                <div class="mood-title">Happiness</div>
+            </div>
+            
+            <div class="mood-card" data-mood="sadness">
+                <div class="mood-icon">😔</div>
+                <div class="mood-title">Sadness</div>
+            </div>
+            
+            <div class="mood-card" data-mood="anxiety">
+                <div class="mood-icon">😰</div>
+                <div class="mood-title">Anxiety</div>
+            </div>
+            
+            <div class="mood-card" data-mood="gratitude">
+                <div class="mood-icon">🙏</div>
+                <div class="mood-title">Gratitude</div>
+            </div>
+            
+            <div class="mood-card" data-mood="hope">
+                <div class="mood-icon">🌟</div>
+                <div class="mood-title">Hope</div>
+            </div>
+            
+            <div class="mood-card" data-mood="patience">
+                <div class="mood-icon">⏳</div>
+                <div class="mood-title">Patience</div>
+            </div>
+            
+            <div class="mood-card" data-mood="guidance">
+                <div class="mood-icon">🧭</div>
+                <div class="mood-title">Guidance</div>
+            </div>
+            
+            <div class="mood-card" data-mood="strength">
+                <div class="mood-icon">💪</div>
+                <div class="mood-title">Strength</div>
+            </div>
+        </div>
+        
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Finding a verse for you...</p>
+        </div>
+        
+        <div class="verse-container">
+            <div class="verse-arabic" id="verse-arabic"></div>
+            <div class="verse-content" id="verse-content"></div>
+            <div class="verse-reference" id="verse-reference"></div>
+            <button class="back-button" id="back-button">Back to Moods</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Mood-Based Quranic Verses | Created with love and respect</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const moodCards = document.querySelectorAll('.mood-card');
+            const verseContainer = document.querySelector('.verse-container');
+            const verseContent = document.getElementById('verse-content');
+            const verseArabic = document.getElementById('verse-arabic');
+            const verseReference = document.getElementById('verse-reference');
+            const backButton = document.getElementById('back-button');
+            const loadingIndicator = document.querySelector('.loading');
+            const moodContainer = document.querySelector('.mood-container');
+            
+            // Predefined verses for each mood (with direct text instead of API calls)
+            const moodVerses = {
+                happiness: [
+                    {
+                        arabic: "إِنَّهُ لَا يَيْأَسُ مِن رَّوْحِ اللَّهِ إِلَّا الْقَوْمُ الْكَافِرُونَ",
+                        english: "Indeed, no one despairs of relief from Allah except the disbelieving people.",
+                        reference: "Surah Yusuf (Joseph), Verse 87"
+                    },
+                    {
+                        arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+                        english: "Unquestionably, by the remembrance of Allah hearts are assured.",
+                        reference: "Surah Ar-Ra'd (The Thunder), Verse 28"
+                    },
+                    {
+                        arabic: "وَإِذْ تَأَذَّنَ رَبُّكُمْ لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
+                        english: "And [remember] when your Lord proclaimed, 'If you are grateful, I will surely increase you [in favor].'",
+                        reference: "Surah Ibrahim, Verse 7"
+                    }
+                ],
+                sadness: [
+                    {
+                        arabic: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ⚫ إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+                        english: "For indeed, with hardship [will be] ease. Indeed, with hardship [will be] ease.",
+                        reference: "Surah Ash-Sharh (The Relief), Verses 5-6"
+                    },
+                    {
+                        arabic: "وَلَنَبْلُوَنَّكُم بِشَيْءٍ مِّنَ الْخَوْفِ وَالْجُوعِ وَنَقْصٍ مِّنَ الْأَمْوَالِ وَالْأَنفُسِ وَالثَّمَرَاتِ وَبَشِّرِ الصَّابِرِينَ",
+                        english: "And We will surely test you with something of fear and hunger and a loss of wealth and lives and fruits, but give good tidings to the patient.",
+                        reference: "Surah Al-Baqarah (The Cow), Verse 155"
+                    },
+                    {
+                        arabic: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ الْأَعْلَوْنَ إِن كُنتُم مُّؤْمِنِينَ",
+                        english: "So do not weaken and do not grieve, and you will be superior if you are [true] believers.",
+                        reference: "Surah Ali 'Imran (Family of Imran), Verse 139"
+                    }
+                ],
+                anxiety: [
+                    {
+                        arabic: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+                        english: "And whoever relies upon Allah - then He is sufficient for him.",
+                        reference: "Surah At-Talaq (The Divorce), Verse 3"
+                    },
+                    {
+                        arabic: "وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ أُجِيبُ دَعْوَةَ الدَّاعِ إِذَا دَعَانِ",
+                        english: "And when My servants ask you concerning Me - indeed I am near. I respond to the invocation of the supplicant when he calls upon Me.",
+                        reference: "Surah Al-Baqarah (The Cow), Verse 186"
+                    },
+                    {
+                        arabic: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
+                        english: "Allah does not charge a soul except [with that within] its capacity.",
+                        reference: "Surah Al-Baqarah (The Cow), Verse 286"
+                    }
+                ],
+                gratitude: [
+                    {
+                        arabic: "وَإِذْ تَأَذَّنَ رَبُّكُمْ لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ ۖ وَلَئِن كَفَرْتُمْ إِنَّ عَذَابِي لَشَدِيدٌ",
+                        english: "And [remember] when your Lord proclaimed, 'If you are grateful, I will surely increase you [in favor]; but if you deny, indeed, My punishment is severe.'",
+                        reference: "Surah Ibrahim, Verse 7"
+                    },
+                    {
+                        arabic: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ",
+                        english: "So remember Me; I will remember you. And be grateful to Me and do not deny Me.",
+                        reference: "Surah Al-Baqarah (The Cow), Verse 152"
+                    },
+                    {
+                        arabic: "وَمَا بِكُم مِّن نِّعْمَةٍ فَمِنَ اللَّهِ",
+                        english: "And whatever you have of favor - it is from Allah.",
+                        reference: "Surah An-Nahl (The Bee), Verse 53"
+                    }
+                ],
+                hope: [
+                    {
+                        arabic: "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا",
+                        english: "Say, 'O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins.'",
+                        reference: "Surah Az-Zumar (The Groups), Verse 53"
+                    },
+                    {
+                        arabic: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ⚫ إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+                        english: "For indeed, with hardship [will be] ease. Indeed, with hardship [will be] ease.",
+                        reference: "Surah Ash-Sharh (The Relief), Verses 5-6"
+                    },
+                    {
+                        arabic: "سَيَجْعَلُ اللَّهُ بَعْدَ عُسْرٍ يُسْرًا",
+                        english: "Allah will grant after hardship, ease.",
+                        reference: "Surah At-Talaq (The Divorce), Verse 7"
+                    }
+                ],
+                patience: [
+                    {
+                        arabic: "يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+                        english: "O you who have believed, seek help through patience and prayer. Indeed, Allah is with the patient.",
+                        reference: "Surah Al-Baqarah (The Cow), Verse 153"
+                    },
+                    {
+                        arabic: "إِنَّمَا يُوَفَّى الصَّابِرُونَ أَجْرَهُم بِغَيْرِ حِسَابٍ",
+                        english: "Indeed, the patient will be given their reward without account [i.e., limit].",
+                        reference: "Surah Az-Zumar (The Groups), Verse 10"
+                    },
+                    {
+                        arabic: "وَالْعَصْرِ ⚫ إِنَّ الْإِنسَانَ لَفِي خُسْرٍ ⚫ إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ",
+                        english: "By time, Indeed, mankind is in loss, Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience.",
+                        reference: "Surah Al-'Asr (Time), Verses 1-3"
+                    }
+                ],
+                guidance: [
+                    {
+                        arabic: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+                        english: "Guide us to the straight path.",
+                        reference: "Surah Al-Fatihah (The Opening), Verse 6"
+                    },
+                    {
+                        arabic: "ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ",
+                        english: "This is the Book about which there is no doubt, a guidance for those conscious of Allah.",
+                        reference: "Surah Al-Baqarah (The Cow), Verse 2"
+                    },
+                    {
+                        arabic: "وَمَن يَعْتَصِم بِاللَّهِ فَقَدْ هُدِيَ إِلَىٰ صِرَاطٍ مُّسْتَقِيمٍ",
+                        english: "And whoever holds firmly to Allah has [indeed] been guided to a straight path.",
+                        reference: "Surah Ali 'Imran (Family of Imran), Verse 101"
+                    }
+                ],
+                strength: [
+                    {
+                        arabic: "وَأَطِيعُوا اللَّهَ وَرَسُولَهُ وَلَا تَنَازَعُوا فَتَفْشَلُوا وَتَذْهَبَ رِيحُكُمْ وَاصْبِرُوا إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+                        english: "And obey Allah and His Messenger, and do not dispute and [thus] lose courage and [then] your strength would depart; and be patient. Indeed, Allah is with the patient.",
+                        reference: "Surah Al-Anfal (The Spoils of War), Verse 46"
+                    },
+                    {
+                        arabic: "إِن يَنصُرْكُمُ اللَّهُ فَلَا غَالِبَ لَكُمْ وَإِن يَخْذُلْكُمْ فَمَن ذَا الَّذِي يَنصُرُكُم مِّن بَعْدِهِ وَعَلَى اللَّهِ فَلْيَتَوَكَّلِ الْمُؤْمِنُونَ",
+                        english: "If Allah should aid you, no one can overcome you; but if He should forsake you, who is there that can aid you after Him? And upon Allah let the believers rely.",
+                        reference: "Surah Ali 'Imran (Family of Imran), Verse 160"
+                    },
+                    {
+                        arabic: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ الْأَعْلَوْنَ إِن كُنتُم مُّؤْمِنِينَ",
+                        english: "So do not weaken and do not grieve, and you will be superior if you are [true] believers.",
+                        reference: "Surah Ali 'Imran (Family of Imran), Verse 139"
+                    }
+                ]
+            };
+            
+            moodCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const mood = this.getAttribute('data-mood');
+                    moodContainer.style.display = 'none';
+                    loadingIndicator.style.display = 'block';
+                    
+                    // Simulate loading for better UX (500ms)
+                    setTimeout(() => {
+                        displayVerseForMood(mood);
+                        loadingIndicator.style.display = 'none';
+                        verseContainer.style.display = 'block';
+                    }, 500);
+                });
+            });
+            
+            backButton.addEventListener('click', function() {
+                verseContainer.style.display = 'none';
+                moodContainer.style.display = 'grid';
+            });
+            
+            function displayVerseForMood(mood) {
+                // Get random verse from the mood's verse list
+                const moodVerseList = moodVerses[mood];
+                const randomVerse = moodVerseList[Math.floor(Math.random() * moodVerseList.length)];
+                
+                // Display the verse
+                verseArabic.textContent = randomVerse.arabic;
+                verseContent.textContent = randomVerse.english;
+                verseReference.textContent = randomVerse.reference;
+            }
+        });
+    </script>
+</body>
+</html>
